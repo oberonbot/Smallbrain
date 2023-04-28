@@ -1,9 +1,9 @@
-import { Alert, Box, Button, Container, Link, Snackbar, Stack, TextField, Typography, useMediaQuery } from '@mui/material'
-import { React, useContext, useState } from 'react'
+import { Box, Button, Container, Link, Stack, TextField, Typography, Alert, useMediaQuery } from '@mui/material'
+import { React, useState } from 'react'
 import styled from 'styled-components'
 import Typewritter from '../Components/Typewritter';
+import api from '../utils';
 import { useNavigate } from 'react-router-dom';
-import { AuthContext } from '../authContext';
 import { useTheme } from '@material-ui/core/styles';
 
 const StyledBox = styled(Box)`
@@ -26,40 +26,31 @@ const StyledInput = styled(TextField)({
   },
 })
 
-const Login = () => {
+const Register = () => {
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
-  const [snackbar, setSnackBar] = useState(false);
+  const navigate = useNavigate();
+
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('xs'));
 
-  const navigate = useNavigate();
-  const { login } = useContext(AuthContext);
+  const handleEmailChange = (e) => setEmail(e.target.value);
+  const handlePasswordChange = e => setPassword(e.target.value);
+  const handleNameChange = (e) => setName(e.target.value);
 
-  const handleLogin = async () => {
-    const result = await login(email, password);
-    if (result.status === 200) {
-      navigate('/');
+  const handleRegister = async () => {
+    const result = await api('admin/auth/register', 'POST', { email, password, name }, undefined);
+    if (result.status === '200') {
+      navigate('/login')
     } else {
       setError(result.data.error);
-      setSnackBar(true);
     }
   };
 
   return (
     <Container>
-        <Snackbar
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-        autoHideDuration={5000}
-        open={snackbar}
-        onClose={() => { setSnackBar(false) }}
-      >
-        <Alert severity="error" sx={{ width: '100%' }} variant='filled'>
-          {error}
-        </Alert>
-      </Snackbar>
-
       <Stack pt={10} alignItems="center">
         <StyledBox>
           <Typography variant={isSmallScreen ? 'h5' : 'h4'} component="h2">
@@ -67,7 +58,7 @@ const Login = () => {
           </Typography>
         </StyledBox>
         <Typography variant="h4" component="h2" pt={5}>
-          Login
+              Register
         </Typography>
         <Stack sx={{ width: '300px' }} spacing={3} pt={5} alignItems="center">
           <StyledInput
@@ -75,7 +66,14 @@ const Login = () => {
             variant="outlined"
             fullWidth
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={handleEmailChange}
+          />
+        <StyledInput
+            label="Username"
+            variant="outlined"
+            fullWidth
+            value={name}
+            onChange={handleNameChange}
           />
           <StyledInput
             label="Password"
@@ -83,21 +81,22 @@ const Login = () => {
             variant="outlined"
             fullWidth
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={handlePasswordChange}
           />
+          {error && <Alert severity="error" variant='outlined'>{error}</Alert>}
           <Button
             variant="contained"
             color="primary"
-            onClick={handleLogin}
+            onClick={handleRegister}
             fullWidth
             sx={{ height: '50px' }}
           >
-            Login
+            Register
           </Button>
           <br />
 
-          <Link href="/register">
-            {'Don\'t have an account? Register here'}
+          <Link href="/login">
+            {'Already have an account? Login here'}
           </Link>
 
         </Stack>
@@ -106,4 +105,4 @@ const Login = () => {
   )
 }
 
-export default Login
+export default Register

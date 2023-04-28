@@ -383,6 +383,7 @@ export const submitAnswers = (playerId, answerList) => sessionLock((resolve, rej
     const session = getActiveSessionFromSessionId(sessionIdFromPlayerId(playerId));
     if (session.position === -1) {
       return reject(new InputError('Session has not started yet'));
+      // if time is out
     } else if (session.answerAvailable) {
       return reject(new InputError('Can\'t answer question once answer is available'));
     } else {

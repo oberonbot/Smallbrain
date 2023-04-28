@@ -84,20 +84,24 @@ app.post('/admin/auth/logout', catchErrors(authed(async (req, res, email) => {
                        Quiz Functions
 ***************************************************************/
 
+// Get all quizzes
 app.get('/admin/quiz', catchErrors(authed(async (req, res, email) => {
   return res.json({ quizzes: await getQuizzesFromAdmin(email), });
 })));
 
+// create a new quiz
 app.post('/admin/quiz/new', catchErrors(authed(async (req, res, email) => {
   return res.json({ quizId: await addQuiz(req.body.name, email), });
 })));
 
+// get quiz by ID
 app.get('/admin/quiz/:quizid', catchErrors(authed(async (req, res, email) => {
   const { quizid, } = req.params;
   await assertOwnsQuiz(email, quizid);
   return res.json(await getQuiz(quizid));
 })));
 
+// update quiz by ID
 app.put('/admin/quiz/:quizid', catchErrors(authed(async (req, res, email) => {
   const { quizid, } = req.params;
   const { questions, name, thumbnail, } = req.body;
@@ -106,6 +110,7 @@ app.put('/admin/quiz/:quizid', catchErrors(authed(async (req, res, email) => {
   return res.status(200).send({});
 })));
 
+// delete quiz by ID
 app.delete('/admin/quiz/:quizid', catchErrors(authed(async (req, res, email) => {
   const { quizid, } = req.params;
   await assertOwnsQuiz(email, quizid);
